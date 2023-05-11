@@ -14,11 +14,18 @@ generer :: LSysteme -> Int -> String
 generer ls 0 = axiome ls
 generer ls n = Prelude.foldl (\acc elm -> acc ++ regles ls elm) "" (generer ls (n - 1))
 
-executer ls n = runTurtle ( setSpeed 0 >> (Prelude.foldl (\acc e -> acc >> (case e of 'F' -> forward 5; '+' -> left 90; '-' -> right 90; _ -> forward 0)) (return ()) (generer ls n)))
+transcrire :: String -> Float -> Float -> TurtleCommand ()
+transcrire chaine pasDeplacement pasRotation = Prelude.foldl (\acc elm -> acc >> case elm of 'F' -> forward pasDeplacement; '+' -> left pasRotation; '-' -> right pasRotation; '|' -> left 180; _ -> return ()) (return ()) chaine
+
+executer :: LSysteme -> Int -> Float -> Float -> IO ()
+executer ls n pasDeplacement pasRotation = runTurtle (setSpeed 0 >> setInvisible >> transcrire (generer ls n) pasDeplacement pasRotation)
 
 koch :: LSysteme
 koch = LSysteme {variables = Set.singleton 'F', constantes = Set.fromList "+-", axiome = "F", regles = \c -> case c of 'F' -> "F+F-F-F+F"; _ -> [c]}
 
+testLSysteme :: LSysteme
+testLSysteme = LSysteme {variables = Set.singleton 'F', constantes = Set.fromList "+-", axiome = "F+F+F+F+", regles = \c -> case c of 'F' -> "F+FF-F-FF+F"; _ -> [c]}
+
 testKoch :: IO ()
 testKoch = do
-  executer koch 3
+  executer testLSysteme 3 10 90

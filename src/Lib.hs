@@ -19,6 +19,6 @@ executer ls n = runTurtle ( setSpeed 0 >> (Prelude.foldl (\acc e -> acc >> (case
 koch :: LSysteme
 koch = LSysteme {variables = Set.singleton 'F', constantes = Set.fromList "+-", axiome = "F", regles = \c -> case c of 'F' -> "F+F-F-F+F"; _ -> [c]}
 
-someFunc :: IO ()
-someFunc = do
+testKoch :: IO ()
+testKoch = do
   executer koch 3
